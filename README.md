@@ -1,29 +1,97 @@
-# vueproject
+# Менеджер Клиентов
 
-This template should help get you started developing with Vue 3 in Vite.
+Веб-приложение для управления клиентской базой, разработанное с использованием Vue 3 и Vite.
 
-## Recommended IDE Setup
+## Функциональность
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Просмотр списка клиентов
+- Добавление новых клиентов
+- Редактирование информации о клиентах
+- Удаление клиентов
+- Поиск по базе клиентов
+- Фильтрация и сортировка данных
 
-## Customize configuration
+## Технологии
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Vue 3
+- Vite
+- Docker
+- Node.js
+- NPM
 
-## Project Setup
+## Установка и запуск
 
-```sh
+### Локальная разработка
+
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/ваш-username/client-manager-app.git
+cd client-manager-app
+```
+
+2. Установите зависимости:
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
+3. Запустите проект в режиме разработки:
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+### Docker установка
 
-```sh
+1. Соберите Docker образ:
+```bash
+docker build -t client-manager-app .
+```
+
+2. Запустите контейнер:
+```bash
+docker run -p 8080:80 --name client-manager-app client-manager-app
+```
+
+## Сборка для продакшена
+
+```bash
 npm run build
 ```
+
+
+
+## Структура проекта
+
+```
+client-manager-app/
+├── src/
+│   ├── assets/         # Статические ресурсы
+│   ├── components/     # Vue компоненты
+│   ├── views/          # Компоненты страниц
+│   ├── router/         # Настройки маршрутизации
+│   ├── store/          # Vuex хранилище
+│   └── App.vue         # Корневой компонент
+├── public/             # Публичные файлы
+├── Dockerfile          # Docker конфигурация
+├── vite.config.js      # Конфигурация Vite
+└── package.json        # Зависимости и скрипты
+```
+
+## Решение проблем
+
+### Конфликт имен Docker контейнеров
+
+Если возникает ошибка о конфликте имен контейнеров, выполните:
+```bash
+docker stop client-manager-app
+docker rm client-manager-app
+```
+
+## Разработка
+
+Для внесения изменений в проект:
+
+1. Создайте новую ветку для ваших изменений
+2. Внесите необходимые изменения
+3. Создайте pull request
+
+

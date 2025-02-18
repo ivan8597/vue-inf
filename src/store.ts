@@ -1,67 +1,90 @@
 import { defineStore } from 'pinia';
-
-export interface Address {
-    country: string;
-    postalCode: string;
-    street: string;
-    office: string;
-}
-
-export interface Contact {
-    phone: string;
-    email: string;
-}
-
-export interface Client {
-    id: number;
-    name: string;
-    balance: number;
-    createdAt: Date;
-    updatedAt: Date;
-    archived: boolean;
-    address: Address;
-    contact: Contact;
-}
+import type { Client } from './types';
+import { storage } from './utils/storage';
 
 export const useClientStore = defineStore('clients', {
     state: () => ({
         clients: [] as Client[],
-        nextId: 1,
-        activeClientId:null as null | number
+        activeClientId: null as number | null,
     }),
+    
+    getters: {
+        getClientById: (state) => (id: number) => 
+            state.clients.find(client => client.id === id),
+            
+        sortedClients: (state) => [...state.clients].sort((a, b) => 
+            b.updatedAt.getTime() - a.updatedAt.getTime()
+        ),
+    },
+
     actions: {
-        addClient(client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) {
-            const newClient = { ...client, id: this.nextId++, createdAt: new Date(), updatedAt: new Date() };
-            this.clients.push(newClient);
+        initializeStore() {
+            this.clients = storage.getClients();
         },
-        editClient(id: number, updatedClient: Partial<Omit<Client, 'id' | 'createdAt'>>) {
-            const client = this.clients.find(client => client.id === id);
-            if (client) {
-                Object.assign(client, updatedClient);//обновляет свойства найденного клиента, копируя значения из updatedClient в client
-                client.updatedAt = new Date();
+
+        addClient(client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) {
+            const maxId = Math.max(0, ...this.clients.map(c => c.id));
+            const newClient: Client = {
+                ...client,
+                id: maxId + 1,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            
+            this.clients.push(newClient);
+            storage.saveClients(this.clients);
+        },
+
+        updateClient(updatedClient: Client) {
+            const index = this.clients.findIndex(c => c.id === updatedClient.id);
+            if (index !== -1) {
+                this.clients[index] = {
+                    ...updatedClient,
+                    updatedAt: new Date()
+                };
+                storage.saveClients(this.clients);
             }
         },
-        setActiveClientId(id:number){//функция чтобы отслеживать, какой клиент в данный момент редактируется 
-          this.activeClientId=id
+
+        deleteClient(id: number) {
+            const index = this.clients.findIndex(c => c.id === id);
+            if (index !== -1) {
+                this.clients.splice(index, 1);
+                storage.saveClients(this.clients);
+            }
         },
-        toggleArchive(id: number) {//функция для переключения состояния архивирования конкретного клиента
-            const client = this.clients.find(client => client.id === id);
+
+        toggleArchive(id: number) {
+            const client = this.getClientById(id);
             if (client) {
                 client.archived = !client.archived;
+                client.updatedAt = new Date();
+                storage.saveClients(this.clients);
             }
         },
-        sortClientsByName() {// функция сортировки по имени
-            this.clients.sort((a, b) => a.name.localeCompare(b.name));
+
+        sortClientsByName() {
+            this.clients.sort((a, b) => 
+                a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'ru')
+            );
+            storage.saveClients(this.clients);
         },
-        sortClientsByBalance() {//функция сортировки по балансу
-            this.clients.sort((a, b) => a.balance - b.balance);
+
+        sortClientsByBalance() {
+            this.clients.sort((a, b) => {
+                const balanceDiff = b.balance - a.balance;
+                return balanceDiff || a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'ru');
+            });
+            storage.saveClients(this.clients);
         },
-        searchClients(query: string) {//функция позволяет пользователю находить клиентов в поиске по имени, адресу, телефону или электронной почте
-            return this.clients.filter(client =>
-                client.name.includes(query) ||
-                client.address.street.includes(query) ||
-                client.contact.phone.includes(query) ||
-                client.contact.email.includes(query)
+
+        searchClients(query: string) {
+            const searchTerm = query.toLowerCase();
+            return this.clients.filter(client => 
+                client.name.toLowerCase().includes(searchTerm) ||
+                client.address.street.toLowerCase().includes(searchTerm) ||
+                client.contact.phone.includes(searchTerm) ||
+                client.contact.email.toLowerCase().includes(searchTerm)
             );
         },
     },

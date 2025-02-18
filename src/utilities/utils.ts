@@ -20,9 +20,14 @@ export const formatPhoneNumber = (input: string) => {
 };
 
 
+
+
 export const validateInput = (event: KeyboardEvent) => {//функция  ограничивает ввод в текстовых полях только буквами 
   const char = String.fromCharCode(event.keyCode);
   if (!/^[a-zA-Zа-яА-ЯёЁ]+$/.test(char)) {
     event.preventDefault();//предотвращает добавление символа в поле ввода
   }
-};
+};;
+
+
+
