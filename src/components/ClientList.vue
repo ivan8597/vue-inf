@@ -7,6 +7,7 @@
         <div class="flex justify-between items-center gap-4">
           <div class="relative flex-1">
             <input
+              data-test="search-input"
               v-model="searchQuery"
               placeholder="Поиск клиента..."
               class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
@@ -19,6 +20,7 @@
           <!-- Кнопки управления -->
           <div class="flex items-center gap-3 flex-shrink-0">
             <button
+              data-test="sort-name"
               @click="sortClientsByName"
               class="whitespace-nowrap px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 transition-all"
             >
@@ -28,6 +30,7 @@
               По имени
             </button>
             <button
+              data-test="sort-balance"
               @click="sortClientsByBalance"
               class="whitespace-nowrap px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 transition-all"
             >
@@ -37,6 +40,7 @@
               По балансу
             </button>
             <button
+              data-test="toggle-archive"
               @click="toggleShowArchived"
               class="whitespace-nowrap px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all"
             >
@@ -48,10 +52,15 @@
     </div>
 
     <!-- Список клиентов -->
-    <ul class="space-y-4 mt-4">
+    <TransitionGroup
+      name="list"
+      tag="ul"
+      class="space-y-4"
+    >
       <li
         v-for="client in filteredClients"
         :key="client.id"
+        data-test="client-item"
         class="bg-white border border-amber-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
       >
         <div class="p-5">
@@ -59,16 +68,19 @@
             <div class="flex-1">
               <!-- Заголовок и баланс -->
               <div class="flex items-center gap-3 mb-3">
-                <h3 class="text-lg font-medium text-gray-900">{{ client.name }}</h3>
-                <span 
-                  class="px-2.5 py-0.5 text-sm font-medium rounded-full" 
+                <h3 data-test="client-name" class="text-lg font-medium text-gray-900">
+                  {{ client.name }}
+                </h3>
+                <div 
+                  data-test="client-balance" 
+                  class="px-2.5 py-0.5 text-sm font-medium rounded-full"
                   :class="client.balance >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                 >
                   {{ client.balance }} USD
-                </span>
+                </div>
                 <span 
-                  class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800"
                   v-if="client.archived"
+                  class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800"
                 >
                   Архив
                 </span>
@@ -156,7 +168,7 @@
           </div>
         </div>
       </li>
-    </ul>
+    </TransitionGroup>
 
     <EditClientModal
       v-if="isModalOpen && selectedClientId !== null"
@@ -172,6 +184,7 @@
     />
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
 import { useClientStore } from "../store";
@@ -207,23 +220,23 @@ export default defineComponent({
     const isModalOpen = ref(false);
     const isDeleteModalOpen = ref(false);
     const clientToDelete = ref<number | null>(null);
-    const toggleShowArchived = () => {//функция для переключения состояния видимости архивированных клиентов, если архивированные клиенты были видны то будут скрыты и наоборот
+    const toggleShowArchived = () => {
       showArchived.value = !showArchived.value;
     };
 
-    const filteredClients = computed(() => {//filteredClients  содержаит только тех клиентов из clientStore.clients, которые не архивированы (если архивированные скрыты) и соответствуют критериям поиска  
+    const filteredClients = computed(() => {
       return clientStore.clients.filter((client) => {
-        const isArchived = !showArchived.value && client.archived;
-        const matchesSearch =
-          client.name.includes(searchQuery.value) ||
-          client.address.street.includes(searchQuery.value) ||
-          client.contact.phone.includes(searchQuery.value) ||
-          client.contact.email.includes(searchQuery.value);
-        return !isArchived && matchesSearch;
+        const matchesSearch = client.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+          client.contact.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+          (client.contact.phone && client.contact.phone.includes(searchQuery.value));
+        
+        const matchesArchived = showArchived.value ? true : !client.archived;
+        
+        return matchesSearch && matchesArchived;
       });
     });
 
-    const toggleArchive = (id: number) => {//функция отвечает за переключение состояния архивирования  клиента
+    const toggleArchive = (id: number) => {
       clientStore.toggleArchive(id);
     };
 
@@ -232,7 +245,7 @@ export default defineComponent({
       isModalOpen.value = true;
     };
 
-    const closeModal = () => {//закрыть модальное окно
+    const closeModal = () => {
       selectedClientId.value = null;
       isModalOpen.value = false;
     };
@@ -248,12 +261,12 @@ export default defineComponent({
       return date.toLocaleString("ru-RU", options);
     };
 
-    const sortClientsByName = () => {// сотировка по имени
-      clientStore.sortClientsByName();
+    const sortClientsByName = () => {
+      clientStore.sortByName();
     };
 
-    const sortClientsByBalance = () => {//сортировка по балансу
-      clientStore.sortClientsByBalance();
+    const sortClientsByBalance = () => {
+      clientStore.sortByBalance();
     };
 
     const confirmDelete = (id: number) => {
@@ -294,3 +307,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+</style>
