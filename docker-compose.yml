@@ -1,23 +1,44 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      target: production-stage
-    container_name: client-manager-app
-    restart: unless-stopped
+  frontend:
+    build: ./frontend
     ports:
-      - "80:80"
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8000
+    depends_on:
+      - backend
     networks:
       - app-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/clientdb
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=clientdb
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./logs:/var/log/nginx
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  logs: 
+  postgres_data: 
