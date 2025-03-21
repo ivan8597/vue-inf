@@ -2,25 +2,28 @@
   <div class="max-w-7xl mx-auto p-6">
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-4">
-        <h1 class="text-2xl font-semibold text-gray-900">{{ showArchived ? 'Архив клиентов' : 'Активные клиенты' }}</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 animate__animated animate__fadeIn">
+          {{ showArchived ? 'Архив клиентов' : 'Активные клиенты' }}
+        </h1>
         <button
           @click="toggleShowArchived"
-          class="px-4 py-2 text-sm font-medium rounded-md"
+          class="px-4 py-2 text-sm font-medium rounded-md animate__animated animate__fadeIn"
           :class="showArchived ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'"
+          data-test="toggle-archive"
         >
           {{ showArchived ? 'Показать активных' : 'Показать архив' }}
         </button>
       </div>
       <router-link
         to="/clients/new"
-        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 animate__animated animate__fadeIn"
       >
         Добавить клиента
       </router-link>
     </div>
 
     <!-- Поиск и сортировка -->
-    <div class="mb-6 flex gap-4">
+    <div class="mb-6 flex gap-4 animate__animated animate__fadeIn">
       <div class="flex-1">
         <input
           v-model="searchQuery"
@@ -46,7 +49,7 @@
       </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="bg-white shadow rounded-lg overflow-hidden animate__animated animate__fadeIn">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -59,7 +62,12 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="client in filteredAndSortedClients" :key="client.id" :class="{ 'bg-gray-50': client.archived }">
+          <tr 
+            v-for="client in filteredAndSortedClients" 
+            :key="client.id" 
+            :class="{ 'bg-gray-50': client.archived }"
+            class="animate__animated animate__fadeIn"
+          >
             <td class="px-6 py-4 whitespace-nowrap">{{ client.name }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ client.contact.email }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ client.contact.phone }}</td>
@@ -78,19 +86,25 @@
               <div class="flex space-x-2">
                 <button
                   @click="openEditModal(client)"
-                  class="text-blue-600 hover:text-blue-900"
+                  class="text-blue-600 hover:text-blue-900 animate__animated animate__fadeIn"
+                  data-test="edit-button"
                 >
                   Редактировать
                 </button>
                 <button
                   @click="toggleArchived(client)"
-                  :class="client.archived ? 'text-green-600 hover:text-green-900' : 'text-amber-600 hover:text-amber-900'"
+                  :class="[
+                    'animate__animated animate__fadeIn',
+                    client.archived ? 'text-green-600 hover:text-green-900' : 'text-amber-600 hover:text-amber-900'
+                  ]"
+                  data-test="archive-button"
                 >
                   {{ client.archived ? 'Восстановить' : 'Архивировать' }}
                 </button>
                 <button
                   @click="openDeleteModal(client)"
-                  class="text-red-600 hover:text-red-900"
+                  class="text-red-600 hover:text-red-900 animate__animated animate__fadeIn"
+                  data-test="delete-button"
                 >
                   Удалить
                 </button>
@@ -265,4 +279,20 @@ const toggleShowArchived = () => {
 }
 
 onMounted(loadClients)
-</script> 
+</script>
+
+<style>
+.animate__animated {
+  animation-duration: 0.5s;
+}
+
+/* Замедляем некоторые анимации для лучшего восприятия */
+.animate__fadeIn {
+  animation-duration: 0.8s;
+}
+
+/* Добавляем задержку для анимации строк таблицы */
+tbody tr {
+  animation-delay: calc(var(--animate-delay) * 0.1s);
+}
+</style> 

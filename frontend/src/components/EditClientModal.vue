@@ -1,11 +1,11 @@
 <template>
   <Modal :isOpen="props.isOpen">
-    <div class="bg-white p-6 rounded-lg max-w-2xl mx-auto">
+    <div class="bg-white p-6 rounded-lg max-w-2xl mx-auto animate__animated" :class="props.isOpen ? 'animate__fadeInDown' : 'animate__fadeOutUp'">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-gray-900">Редактировать клиента</h2>
+        <h2 class="text-xl font-semibold text-gray-900 animate__animated animate__fadeIn">Редактировать клиента</h2>
         <button 
           @click="props.close"
-          class="text-gray-400 hover:text-gray-500"
+          class="text-gray-400 hover:text-gray-500 animate__animated animate__fadeIn"
         >
           <XMarkIcon class="h-6 w-6" />
         </button>
@@ -14,6 +14,7 @@
       <ClientFormBase 
         :client="client"
         @submit="handleSubmit"
+        class="animate__animated animate__fadeIn animate__delay-1s"
       />
     </div>
   </Modal>
@@ -91,4 +92,14 @@ defineExpose({
   client,
   handleSubmit
 })
-</script> 
+</script>
+
+<style scoped>
+.animate__animated {
+  animation-duration: 0.5s;
+}
+
+.animate__delay-1s {
+  animation-delay: 0.2s;
+}
+</style> 

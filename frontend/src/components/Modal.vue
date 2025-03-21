@@ -3,30 +3,22 @@
     enter-active-class="animate__animated animate__fadeIn"
     leave-active-class="animate__animated animate__fadeOut"
   >
-    <div v-if="isOpen" class="modal-overlay">
-      <div class="modal-content animate__animated animate__zoomIn">
+    <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="relative max-h-[90vh] overflow-y-auto">
         <slot />
       </div>
     </div>
   </Transition>
 </template>
 
-<script lang="ts">
-export default {
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true
-    }
-  }
-}
+<script setup lang="ts">
+defineProps<{
+  isOpen: boolean
+}>()
 </script>
 
 <style scoped>
-.modal-overlay {
+.animate__animated {
   animation-duration: 0.3s;
-}
-.modal-content {
-  animation-duration: 0.4s;
 }
 </style> 

@@ -45,8 +45,9 @@ class ClientBase(BaseModel):
 class Client(ClientBase):
     id: Optional[int] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # API endpoints
 @app.get("/api/clients", response_model=List[Client])
@@ -136,6 +137,16 @@ async def update_client(client_id: int, client: ClientBase, db: Session = Depend
     
     db.commit()
     db.refresh(db_client)
+    
+    return db_client
+
+@app.get("/api/clients/{client_id}", response_model=Client)
+async def get_client(client_id: int, db: Session = Depends(get_db)):
+    logger.info(f"Получен GET запрос на /api/clients/{client_id}")
+    
+    db_client = db.query(DBClient).filter(DBClient.id == client_id).first()
+    if not db_client:
+        raise HTTPException(status_code=404, detail="Client not found")
     
     return db_client
 

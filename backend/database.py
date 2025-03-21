@@ -1,20 +1,23 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy.orm import DeclarativeBase
 from dotenv import load_dotenv
 import os
 
 # Загружаем переменные окружения
 load_dotenv()
 
-# Получаем URL базы данных из переменных окружения или используем значение по умолчанию
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/client_manager")
+# Получаем URL базы данных из переменных окружения 
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@db:5432/client_manager")
 
 # Создаем движок SQLAlchemy
 engine = create_engine(DATABASE_URL)
 
 # Создаем базовый класс для моделей
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 # Создаем сессию
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
