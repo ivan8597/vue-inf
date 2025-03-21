@@ -18,7 +18,7 @@ const routes = [
     component: () => import('../components/ClientForm.vue')
   },
   {
-    path: '/clients/:id',
+    path: '/clients/:id/edit',
     name: 'edit-client',
     component: () => import('../components/ClientForm.vue'),
     props: true

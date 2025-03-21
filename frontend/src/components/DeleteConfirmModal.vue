@@ -4,20 +4,20 @@
       <div class="text-center">
         <ExclamationTriangleIcon class="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 class="text-lg font-medium text-gray-900 mb-2">
-          Удалить клиента?
+          Удалить клиента {{ client?.name }}?
         </h3>
         <p class="text-sm text-gray-500 mb-6">
           Это действие нельзя будет отменить
         </p>
         <div class="flex justify-center gap-4">
           <button
-            @click="$emit('cancel')"
+            @click="close"
             class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
           >
             Отмена
           </button>
           <button
-            @click="$emit('confirm')"
+            @click="$emit('confirmed')"
             class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
             Удалить
@@ -28,24 +28,18 @@
   </Modal>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import Modal from './Modal.vue'
+<script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
+import Modal from './Modal.vue'
+import type { Client } from '../types'
 
-export default defineComponent({
-  components: {
-    Modal,
-    ExclamationTriangleIcon
-  },
+defineProps<{
+  isOpen: boolean
+  client: Client | null
+  close: () => void
+}>()
 
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true
-    }
-  },
-
-  emits: ['confirm', 'cancel']
-})
+defineEmits<{
+  confirmed: []
+}>()
 </script> 

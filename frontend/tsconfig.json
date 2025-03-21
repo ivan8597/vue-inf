@@ -7,7 +7,7 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -23,7 +23,8 @@
     /* Type Checking */
     "types": [
       "vite/client",
-      "vue"
+      "vue",
+      "vue-router"
     ],
     "paths": {
       "@/*": ["./src/*"]

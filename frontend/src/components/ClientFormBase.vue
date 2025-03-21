@@ -30,6 +30,16 @@
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
         />
       </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Баланс</label>
+        <input
+          v-model.number="formData.balance"
+          type="number"
+          step="0.01"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
+        />
+      </div>
     </div>
 
     <!-- Адрес -->

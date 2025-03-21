@@ -9,9 +9,7 @@ export interface Client {
   archived: boolean
   address: {
     country: string
-    postalCode?: string
     street: string
-    office?: string
   }
   createdAt?: Date
   updatedAt?: Date
